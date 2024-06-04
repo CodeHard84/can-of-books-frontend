@@ -3,8 +3,13 @@ import { Component } from "react";
 class Profile extends Component {
 
   render() {
-    /* TODO: render information about the developers */
-    return <p>Profile page coming soon</p>
+    return (
+      <div>
+        <h1>Profile</h1>
+        <p>Name: Jace</p>
+        <p>GitHub: <a href="https://github.com/codeHard84/">CodeHard84</a></p>
+      </div>
+    )
   }
 }
 
