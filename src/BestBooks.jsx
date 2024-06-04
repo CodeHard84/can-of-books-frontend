@@ -1,49 +1,56 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Carousel } from 'react-bootstrap';
+import { Carousel, Button } from 'react-bootstrap';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-class BestBooks extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      books: []
-    }
-  }
+const BestBooks = ({ books, setBooks, deleteBook }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
 
-  componentDidMount() {
+  useEffect(() => {
     axios.get(`${SERVER_URL}/books`)
       .then(response => {
-        this.setState({ books: response.data });
+        setBooks(response.data);
       })
       .catch(error => {
         console.log(error);
       });
-  }
+  }, [setBooks]);
 
+  const handleSelect = (selectedIndex, e) => {
+    setActiveIndex(selectedIndex);
+  };
 
-  render() {
+  return (
+    <>
+      <h2>My Essential Lifelong Learning &amp; Formation Shelf</h2>
 
-    return (
-      <>
-        <h2>My Essential Lifelong Learning &amp; Formation Shelf</h2>
-
-        {this.state.books.length ? (
-          <Carousel>
-            {this.state.books.map((book, index) => (
+      {books.length ? (
+        <div className="book-carousel-wrapper">
+          <Carousel activeIndex={activeIndex} onSelect={handleSelect}>
+            {books.map((book, index) => (
               <Carousel.Item key={index}>
-                <p>{book.title}</p>
-                <p>{book.description}</p>
+                <div className="carousel-content">
+                  <p>{book.title}</p>
+                  <p>{book.description}</p>
+                </div>
               </Carousel.Item>
             ))}
           </Carousel>
-        ) : (
-          <h3>No Books Found :(</h3>
-        )}
-      </>
-    )
-  }
+          <Button 
+            style={{ marginBottom: '10px' }}
+            variant="danger" 
+            className="delete-button" 
+            onClick={() => deleteBook(books[activeIndex]._id)}
+          >
+            Delete Book
+          </Button>
+        </div>
+      ) : (
+        <h3>No Books Found :(</h3>
+      )}
+    </>
+  );
 }
 
 export default BestBooks;

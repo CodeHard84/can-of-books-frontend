@@ -9,3 +9,5 @@ Books are life-changing. They have the power to enlighten, educate, entertain, h
 ## Overview
 
 This simple JS, React, MongoDB application will allow you to store your book collection in ironically enough a MongoDB collection.
+
+* We now connect to the backend in the cloud.
