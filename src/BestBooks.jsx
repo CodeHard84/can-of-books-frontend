@@ -1,49 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Carousel } from 'react-bootstrap';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-class BestBooks extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      books: []
-    }
-  }
+const BestBooks = () => {
+  const [books, setBooks] = useState([]);
 
-  componentDidMount() {
+  useEffect(() => {
     axios.get(`${SERVER_URL}/books`)
       .then(response => {
-        this.setState({ books: response.data });
+        setBooks(response.data);
       })
       .catch(error => {
         console.log(error);
       });
-  }
+  }, []);
 
+  return (
+    <>
+      <h2>My Essential Lifelong Learning &amp; Formation Shelf</h2>
 
-  render() {
-
-    return (
-      <>
-        <h2>My Essential Lifelong Learning &amp; Formation Shelf</h2>
-
-        {this.state.books.length ? (
-          <Carousel>
-            {this.state.books.map((book, index) => (
-              <Carousel.Item key={index}>
-                <p>{book.title}</p>
-                <p>{book.description}</p>
-              </Carousel.Item>
-            ))}
-          </Carousel>
-        ) : (
-          <h3>No Books Found :(</h3>
-        )}
-      </>
-    )
-  }
+      {books.length ? (
+        <Carousel>
+          {books.map((book, index) => (
+            <Carousel.Item key={index}>
+              <p>{book.title}</p>
+              <p>{book.description}</p>
+            </Carousel.Item>
+          ))}
+        </Carousel>
+      ) : (
+        <h3>No Books Found :(</h3>
+      )}
+    </>
+  );
 }
 
 export default BestBooks;
