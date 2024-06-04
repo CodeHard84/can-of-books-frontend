@@ -1,4 +1,6 @@
 import React from 'react';
+import axios from 'axios';
+import { Carousel } from 'react-bootstrap';
 
 class BestBooks extends React.Component {
   constructor(props) {
@@ -8,18 +10,32 @@ class BestBooks extends React.Component {
     }
   }
 
-  /* TODO: Make a GET request to your API to fetch all the books from the database  */
+  componentDidMount() {
+    axios.get('http://localhost:3001/books')
+      .then(response => {
+        this.setState({ books: response.data });
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
 
   render() {
-
-    /* TODO: render all the books in a Carousel */
 
     return (
       <>
         <h2>My Essential Lifelong Learning &amp; Formation Shelf</h2>
 
         {this.state.books.length ? (
-          <p>Book Carousel coming soon</p>
+          <Carousel>
+            {this.state.books.map((book, index) => (
+              <Carousel.Item key={index}>
+                <p>{book.title}</p>
+                <p>{book.description}</p>
+              </Carousel.Item>
+            ))}
+          </Carousel>
         ) : (
           <h3>No Books Found :(</h3>
         )}
