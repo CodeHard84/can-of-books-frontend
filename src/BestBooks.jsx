@@ -2,6 +2,8 @@ import React from 'react';
 import axios from 'axios';
 import { Carousel } from 'react-bootstrap';
 
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
+
 class BestBooks extends React.Component {
   constructor(props) {
     super(props);
@@ -11,7 +13,7 @@ class BestBooks extends React.Component {
   }
 
   componentDidMount() {
-    axios.get('http://localhost:3001/books')
+    axios.get(`${SERVER_URL}/books`)
       .then(response => {
         this.setState({ books: response.data });
       })
