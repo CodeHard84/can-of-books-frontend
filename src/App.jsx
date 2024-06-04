@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import BestBooks from './BestBooks';
-import AddBook from './AddBook';
+import BookFormModal from './BookFormModal';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import {
@@ -13,7 +13,7 @@ import {
 import Profile from './About';
 
 const App = () => {
-  const [showAddBookForm, setShowAddBookForm] = useState(false);
+  const [showAddBookModal, setShowAddBookModal] = useState(false);
   const [books, setBooks] = useState([]);
 
   const updateBooks = (newBook) => {
@@ -29,9 +29,13 @@ const App = () => {
             exact path="/"
             element={
               <>
+                <button onClick={() => setShowAddBookModal(true)}>Add Book</button>
+                <BookFormModal
+                  show={showAddBookModal}
+                  handleClose={() => setShowAddBookModal(false)}
+                  updateBooks={updateBooks}
+                />
                 <BestBooks books={books} setBooks={setBooks} />
-                <button onClick={() => setShowAddBookForm(true)}>Add Book</button>
-                {showAddBookForm && <AddBook setShowAddBookForm={setShowAddBookForm} updateBooks={updateBooks} />}
               </>
             }
           />
