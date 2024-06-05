@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-const AddBook = ({ setShowAddBookForm, updateBooks }) => {
+const BookFormModal = ({ show, handleClose, updateBooks }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('');
@@ -18,35 +19,57 @@ const AddBook = ({ setShowAddBookForm, updateBooks }) => {
       });
       console.log('Book added:', response.data);
       updateBooks(response.data);
-      setShowAddBookForm(false);
+      handleClose();
     } catch (error) {
       console.error('Error adding book:', error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>
-          Title:
-          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
-        </label>
-      </div>
-      <div>
-        <label>
-          Description:
-          <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} required />
-        </label>
-      </div>
-      <div>
-        <label>
-          Status:
-          <input type="text" value={status} onChange={(e) => setStatus(e.target.value)} required />
-        </label>
-      </div>
-      <button type="submit">Add Book</button>
-    </form>
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>Add New Book</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group controlId="formTitle">
+            <Form.Label>Title</Form.Label>
+            <Form.Control
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </Form.Group>
+          <Form.Group controlId="formDescription">
+            <Form.Label>Description</Form.Label>
+            <Form.Control
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+          </Form.Group>
+          <Form.Group controlId="formStatus">
+            <Form.Label>Status</Form.Label>
+            <Form.Select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              required
+            >
+              <option value="">Select Status</option>
+              <option value="available">Available</option>
+              <option value="checked out">Checked Out</option>
+              <option value="reserved">Reserved</option>
+            </Form.Select>
+          </Form.Group>
+          <Button variant="primary" type="submit" style={{ marginTop: '10px' }}>
+            Add Book
+          </Button>
+        </Form>
+      </Modal.Body>
+    </Modal>
   );
 }
 
-export default AddBook;
+export default BookFormModal;
