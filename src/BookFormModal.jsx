@@ -52,12 +52,16 @@ const BookFormModal = ({ show, handleClose, updateBooks }) => {
           </Form.Group>
           <Form.Group controlId="formStatus">
             <Form.Label>Status</Form.Label>
-            <Form.Control
-              type="text"
+            <Form.Select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
               required
-            />
+            >
+              <option value="">Select Status</option>
+              <option value="available">Available</option>
+              <option value="checked out">Checked Out</option>
+              <option value="reserved">Reserved</option>
+            </Form.Select>
           </Form.Group>
           <Button variant="primary" type="submit" style={{ marginTop: '10px' }}>
             Add Book
