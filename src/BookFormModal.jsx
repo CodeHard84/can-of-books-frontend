@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -8,6 +9,13 @@ const BookFormModal = ({ show, handleClose, updateBooks, bookToEdit }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('');
+  const { getIdTokenClaims } = useAuth0();
+
+  const getToken = async () => {
+    const token = await getIdTokenClaims(); // I think getAccessTokenSilently() would be better because it returns only the token.
+    // console.log('token:', token);
+    return token;
+  }
 
   useEffect(() => {
     if (bookToEdit) {
@@ -24,20 +32,28 @@ const BookFormModal = ({ show, handleClose, updateBooks, bookToEdit }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      const token = await getToken();
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${token.__raw}`,
+          'User': token.email
+        }
+      };
       if (bookToEdit) {
         const response = await axios.put(`${SERVER_URL}/books/${bookToEdit._id}`, {
           title,
           description,
           status
-        });
+        }, config);
         console.log('Book updated:', response.data);
         updateBooks(response.data);
       } else {
         const response = await axios.post(`${SERVER_URL}/books`, {
           title,
           description,
-          status
-        });
+          status,
+          user: token.email
+        }, config);
         console.log('Book added:', response.data);
         updateBooks(response.data);
       }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Carousel, Button } from 'react-bootstrap';
 import BookFormModal from './BookFormModal'; // Adjust the path as needed
+import { useAuth0 } from '@auth0/auth0-react';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -9,15 +10,28 @@ const BestBooks = ({ books, setBooks, deleteBook }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [bookToEdit, setBookToEdit] = useState(null);
+  const { getIdTokenClaims } = useAuth0();
 
   useEffect(() => {
-    axios.get(`${SERVER_URL}/books`)
-      .then(response => {
+    const fetchBooks = async () => {
+      try {
+
+        const token = await getIdTokenClaims();
+        const config = {
+          headers: {
+            'Authorization': `Bearer ${token.__raw}`,
+            'User': token.email
+          }
+        };
+
+        const response = await axios.get(`${SERVER_URL}/books`, config);
         setBooks(response.data);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+      } catch (error) {
+        console.error('Error fetching books:', error);
+      }
+    };
+
+    fetchBooks();
   }, [setBooks]);
 
   const handleSelect = (selectedIndex, e) => {
@@ -47,6 +61,14 @@ const BestBooks = ({ books, setBooks, deleteBook }) => {
     });
   };
 
+  const handleDelete = async (bookId) => {
+    try {
+      deleteBook(bookId);
+    } catch (error) {
+      console.error('Error deleting book:', error);
+    }
+  };
+
   return (
     <>
       <h2>My Essential Lifelong Learning &amp; Formation Shelf</h2>
@@ -63,17 +85,17 @@ const BestBooks = ({ books, setBooks, deleteBook }) => {
               </Carousel.Item>
             ))}
           </Carousel>
-          <Button 
+          <Button
             style={{ marginBottom: '10px', marginRight: '10px' }}
-            variant="secondary" 
+            variant="secondary"
             onClick={handleEdit}
           >
             Edit Book
           </Button>
-          <Button 
+          <Button
             style={{ marginBottom: '10px' }}
-            variant="danger" 
-            onClick={() => deleteBook(books[activeIndex]._id)}
+            variant="danger"
+            onClick={() => handleDelete(books[activeIndex]._id)}
           >
             Delete Book
           </Button>
@@ -82,11 +104,11 @@ const BestBooks = ({ books, setBooks, deleteBook }) => {
         <h3>No Books Found :( </h3>
       )}
 
-      <BookFormModal 
-        show={showModal} 
-        handleClose={handleClose} 
-        updateBooks={updateBooks} 
-        bookToEdit={bookToEdit} 
+      <BookFormModal
+        show={showModal}
+        handleClose={handleClose}
+        updateBooks={updateBooks}
+        bookToEdit={bookToEdit}
       />
     </>
   );
