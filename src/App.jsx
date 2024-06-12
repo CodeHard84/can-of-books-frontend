@@ -14,13 +14,14 @@ import Profile from './About';
 import UserProfile from './UserProfile';
 import axios from 'axios';
 import { useAuth0 } from '@auth0/auth0-react';
+import Welcome from './Welcome';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const App = () => {
   const [showAddBookModal, setShowAddBookModal] = useState(false);
   const [books, setBooks] = useState([]);
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -41,7 +42,15 @@ const App = () => {
 
   const deleteBook = async (bookId) => {
     try {
-      await axios.delete(`${SERVER_URL}/books/${bookId}`);
+
+      const token = await getAccessTokenSilently();
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      };
+
+      await axios.delete(`${SERVER_URL}/books/${bookId}`, config);
       setBooks(books.filter(book => book._id !== bookId));
     } catch (error) {
       console.error('Error deleting book:', error);
@@ -69,7 +78,7 @@ const App = () => {
                   <BestBooks books={books} setBooks={setBooks} deleteBook={deleteBook} />
                 </>
               ) : (
-                <p>You need to login.</p>
+                <Welcome />
               )
             }
           />

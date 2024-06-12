@@ -11,13 +11,16 @@ const BestBooks = ({ books, setBooks, deleteBook }) => {
   const [bookToEdit, setBookToEdit] = useState(null);
 
   useEffect(() => {
-    axios.get(`${SERVER_URL}/books`)
-      .then(response => {
+    const fetchBooks = async () => {
+      try {
+        const response = await axios.get(`${SERVER_URL}/books`);
         setBooks(response.data);
-      })
-      .catch(error => {
-        console.log(error);
-      });
+      } catch (error) {
+        console.error('Error fetching books:', error);
+      }
+    };
+
+    fetchBooks();
   }, [setBooks]);
 
   const handleSelect = (selectedIndex, e) => {
@@ -47,6 +50,14 @@ const BestBooks = ({ books, setBooks, deleteBook }) => {
     });
   };
 
+  const handleDelete = async (bookId) => {
+    try {
+      deleteBook(bookId);
+    } catch (error) {
+      console.error('Error deleting book:', error);
+    }
+  };
+
   return (
     <>
       <h2>My Essential Lifelong Learning &amp; Formation Shelf</h2>
@@ -63,17 +74,17 @@ const BestBooks = ({ books, setBooks, deleteBook }) => {
               </Carousel.Item>
             ))}
           </Carousel>
-          <Button 
+          <Button
             style={{ marginBottom: '10px', marginRight: '10px' }}
-            variant="secondary" 
+            variant="secondary"
             onClick={handleEdit}
           >
             Edit Book
           </Button>
-          <Button 
+          <Button
             style={{ marginBottom: '10px' }}
-            variant="danger" 
-            onClick={() => deleteBook(books[activeIndex]._id)}
+            variant="danger"
+            onClick={() => handleDelete(books[activeIndex]._id)}
           >
             Delete Book
           </Button>
@@ -82,11 +93,11 @@ const BestBooks = ({ books, setBooks, deleteBook }) => {
         <h3>No Books Found :( </h3>
       )}
 
-      <BookFormModal 
-        show={showModal} 
-        handleClose={handleClose} 
-        updateBooks={updateBooks} 
-        bookToEdit={bookToEdit} 
+      <BookFormModal
+        show={showModal}
+        handleClose={handleClose}
+        updateBooks={updateBooks}
+        bookToEdit={bookToEdit}
       />
     </>
   );
