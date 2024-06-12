@@ -2,6 +2,8 @@ import React from 'react';
 import { Navbar, NavItem, Container, Row, Col } from 'react-bootstrap';
 import { Link } from "react-router-dom";
 import LoginButton from './Login';
+import { withAuth0 } from '@auth0/auth0-react';
+import LogoutButton from './Logout';
 
 class Header extends React.Component {
   render() {
@@ -13,11 +15,16 @@ class Header extends React.Component {
             <Col><NavItem><Link to="/" className="nav-link">Home</Link></NavItem></Col>
             <Col><NavItem><Link to="/about" className="nav-link">About</Link></NavItem></Col>
           </Row>
-          <LoginButton />
+
+          {this.props.auth0.isAuthenticated ? (
+            <LogoutButton />
+          ) : (
+            <LoginButton />
+          )}
         </Container>
       </Navbar>
     )
   }
 }
 
-export default Header;
+export default withAuth0(Header);
