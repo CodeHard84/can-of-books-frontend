@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import BestBooks from './BestBooks';
@@ -11,13 +11,16 @@ import {
   Route
 } from "react-router-dom";
 import Profile from './About';
+import UserProfile from './UserProfile';
 import axios from 'axios';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const App = () => {
   const [showAddBookModal, setShowAddBookModal] = useState(false);
   const [books, setBooks] = useState([]);
+  const { isAuthenticated } = useAuth0();
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -50,23 +53,28 @@ const App = () => {
       <Router>
         <Header />
         <Routes>
-          <Route 
+          <Route
             exact path="/"
             element={
-              <>
-                <button 
-                style={{ marginTop: '10px' }}
-                onClick={() => setShowAddBookModal(true)}>Add Book</button>
-                <BookFormModal
-                  show={showAddBookModal}
-                  handleClose={() => setShowAddBookModal(false)}
-                  updateBooks={updateBooks}
-                />
-                <BestBooks books={books} setBooks={setBooks} deleteBook={deleteBook} />
-              </>
+              isAuthenticated ? (
+                <>
+                  <button
+                    style={{ marginTop: '10px' }}
+                    onClick={() => setShowAddBookModal(true)}>Add Book</button>
+                  <BookFormModal
+                    show={showAddBookModal}
+                    handleClose={() => setShowAddBookModal(false)}
+                    updateBooks={updateBooks}
+                  />
+                  <BestBooks books={books} setBooks={setBooks} deleteBook={deleteBook} />
+                </>
+              ) : (
+                <p>You need to login.</p>
+              )
             }
           />
           <Route path="/about" element={<Profile />} />
+          <Route path="/profile" element={<UserProfile />} />
         </Routes>
         <Footer />
       </Router>
