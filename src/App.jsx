@@ -21,32 +21,44 @@ const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 const App = () => {
   const [showAddBookModal, setShowAddBookModal] = useState(false);
   const [books, setBooks] = useState([]);
-  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const { isAuthenticated, getIdTokenClaims } = useAuth0();
 
   useEffect(() => {
     const fetchBooks = async () => {
-      try {
-        const response = await axios.get(`${SERVER_URL}/books`);
-        setBooks(response.data);
-      } catch (error) {
-        console.error('Error fetching books:', error);
+      if (isAuthenticated) {
+        try {
+          const token = await getIdTokenClaims();
+          const config = {
+            headers: {
+              'Authorization': `Bearer ${token.__raw}`,
+              'User': token.email
+            }
+          };
+
+          const response = await axios.get(`${SERVER_URL}/books`, config);
+          setBooks(response.data);
+        } catch (error) {
+          console.error('Error fetching books:', error);
+        }
+      } else {
+        console.log('User is not authenticated');
       }
     };
 
     fetchBooks();
-  }, []); // <--- Simulates componentDidMount
+  }, [isAuthenticated, getIdTokenClaims, setBooks]);
 
   const updateBooks = (newBook) => {
-    setBooks([...books, newBook]); // <--- Makes a shallow copy using spread to maintain immutability
+    setBooks([...books, newBook]); // Makes a shallow copy using spread to maintain immutability
   };
 
   const deleteBook = async (bookId) => {
     try {
-
-      const token = await getAccessTokenSilently();
+      const token = await getIdTokenClaims();
       const config = {
         headers: {
-          Authorization: `Bearer ${token}`
+          'Authorization': `Bearer ${token.__raw}`,
+          'User': token.email
         }
       };
 

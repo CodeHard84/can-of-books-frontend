@@ -35,7 +35,8 @@ const BookFormModal = ({ show, handleClose, updateBooks, bookToEdit }) => {
       const token = await getToken();
       const config = {
         headers: {
-          Authorization: `Bearer ${token.__raw}`
+          'Authorization': `Bearer ${token.__raw}`,
+          'User': token.email
         }
       };
       if (bookToEdit) {
@@ -50,7 +51,8 @@ const BookFormModal = ({ show, handleClose, updateBooks, bookToEdit }) => {
         const response = await axios.post(`${SERVER_URL}/books`, {
           title,
           description,
-          status
+          status,
+          user: token.email
         }, config);
         console.log('Book added:', response.data);
         updateBooks(response.data);
